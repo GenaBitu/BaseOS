@@ -1,2 +1,3 @@
 # BaseOS
-Basic Operating system
+Basic Operating system written in C/C++ and assembly
+Created for learning purposes.
