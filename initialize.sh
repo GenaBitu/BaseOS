@@ -2,9 +2,9 @@
 # Installs all needed development apps, compiles a cross-compiler to BaseOS, sets up QEMU.
 # Written for Ubuntu, other distros might need minor changes (replacing apt with yum etc.).
 
-DEPENDENCIES="build-essential texinfo qemu"
-export PREFIX=$(pwd)"/GCC-x"
-export TARGET="i686-elf"
+DEPENDENCIES="build-essential libgmp-dev texinfo qemu"
+TARGET="i686-elf"
+PREFIX=$(pwd)"/GCC-"$TARGET
 export PATH="$PREFIX/bin:$PATH"
 
 BINUTILS="binutils-2.25"
@@ -74,3 +74,6 @@ make all-target-libgcc
 make install-gcc
 make install-target-libgcc
 cd ..
+
+cd ..
+rm -fr build
