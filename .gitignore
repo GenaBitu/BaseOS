@@ -1,3 +1,7 @@
 .c9/
 GCC-*/
 build/
+obj/
+bin/
+iso/
+isodir/

@@ -2,7 +2,7 @@
 # Installs all needed development apps, compiles a cross-compiler to BaseOS, sets up QEMU.
 # Written for Ubuntu, other distros might need minor changes (replacing apt with yum etc.).
 
-DEPENDENCIES="build-essential libgmp-dev texinfo qemu"
+DEPENDENCIES="build-essential libgmp-dev texinfo qemu xorriso"
 TARGET="i686-elf"
 PREFIX=$(pwd)"/GCC-"$TARGET
 export PATH="$PREFIX/bin:$PATH"
