@@ -20,7 +20,9 @@ section .text
 global _start
 _start:
 mov	esp, stack_top
+extern	kernel_early
 extern	kernel_main
+call	kernel_early
 call	kernel_main
 cli
 
