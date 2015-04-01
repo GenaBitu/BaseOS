@@ -1,3 +1,6 @@
+#ifndef TTY_H
+#define TTY_H
+
 #include "vga.h"
 #include <stddef.h>
 #include <stdint.h>
@@ -10,3 +13,6 @@ void terminal_initialize();
 void terminal_newline();
 void terminal_putc(char c);
 void terminal_print(const char* str);
+
+#endif // TTY_H
+

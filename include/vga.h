@@ -1,3 +1,6 @@
+#ifndef VGA_H
+#define VGA_H
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -35,3 +38,6 @@ static inline uint16_t make_vga_char(char c, uint8_t color)
 	uint16_t color16 = color;
 	return c16 | color16 << 8;
 }
+
+#endif // VGA_H
+

@@ -11,3 +11,4 @@ void kernel_main()
 {
 	terminal_print("Hello World!\nWelcome to multiline!");
 }
+

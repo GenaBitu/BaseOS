@@ -55,3 +55,4 @@ void terminal_print(const char* str)
 		terminal_putc(str[i]);
 	}
 }
+

@@ -13,3 +13,4 @@ _fini:
 	push	%ebp
 	movl %esp,	%ebp
 	# GCC will automatically put .fini section from crtbegin.o here.
+
