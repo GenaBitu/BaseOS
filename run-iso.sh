@@ -1,4 +1,4 @@
 #!/bin/bash
 
-qemu-system-i386 -cdrom iso/release/BaseOS.iso
+qemu-system-i386 -cdrom iso/i686/BaseOS.iso
 

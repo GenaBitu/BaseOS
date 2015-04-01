@@ -4,7 +4,7 @@ CC = GCC-i686-elf/bin/i686-elf-gcc
 
 LDSCRIPT = linker.ld
 
-ASFLAGS =
+ASFLAGS = .intel_syntax noprefix
 LDFLAGS = -ffreestanding -O2 -nostdlib
 LDLIBS = -lgcc
 CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra
