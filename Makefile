@@ -17,13 +17,19 @@ ASFLAGS_I686 = $(ASFLAGS)
 LDFLAGS_I686 = $(LDFLAGS)
 LDLIBS_I686 = $(LDLIBS)
 CFLAGS_I686 = $(CFLAGS)
-SRCDIR_I686 = $(SRCDIR)
+ARCHDIR_I686 = $(SRCDIR)/arch/i686
 OBJDIR_I686 = $(OBJDIR)/i686
 BINDIR_I686 = $(BINDIR)/i686
 ISODIR_I686 = $(ISODIR)/i686
 OUT_I686 = $(BINDIR_I686)/BaseOS.bin
+CRTI_I686 = $(OBJDIR_I686)/crti.o
+CRTN_I686 = $(OBJDIR_I686)/crtn.o
 
-OBJ_I686 = $(OBJDIR_I686)/boot.o $(OBJDIR_I686)/kernel.o $(OBJDIR_I686)/tty.o
+CRTBEGIN = $(shell $(CC) $(CFLAGS) -print-file-name=crtbegin.o)
+CRTEND = $(shell $(CC) $(CFLAGS) -print-file-name=crtend.o)
+
+OBJLIST_I686 = $(OBJDIR_I686)/boot.o $(OBJDIR_I686)/kernel.o $(OBJDIR_I686)/tty.o
+OBJ_I686 = $(CRTI_I686) $(CRTBEGIN) $(OBJLIST_I686) $(CRTEND) $(CRTN_I686)
 
 all: i686
 
@@ -35,17 +41,23 @@ before_i686:
 	test -d $(BINDIR_I686) || mkdir -p $(BINDIR_I686)
 	test -d $(OBJDIR_I686) || mkdir -p $(OBJDIR_I686)
 
-out_i686: $(OBJ_I686)
+out_i686: $(OBJ_I686) $(LDSCRIPT)
 	$(LD) -T $(LDSCRIPT) -o $(OUT_I686) $(LDFLAGS_I686) $(OBJ_I686) $(LDFLAGS_I686)
 
-$(OBJDIR_I686)/boot.o: $(SRCDIR_I686)/arch/i686/boot.asm
-	$(AS) $(ASFLAGS_I686) $(SRCDIR_I686)/arch/i686/boot.asm -o $(OBJDIR_I686)/boot.o
+$(OBJDIR_I686)/boot.o: $(ARCHDIR_I686)/boot.asm
+	$(AS) $(ASFLAGS_I686) $(ARCHDIR_I686)/boot.asm -o $(OBJDIR_I686)/boot.o
 
-$(OBJDIR_I686)/kernel.o: $(SRCDIR_I686)/kernel.c
-	$(CC) -c $(SRCDIR_I686)/kernel.c -o $(OBJDIR_I686)/kernel.o $(CFLAGS_I686)
+$(OBJDIR_I686)/crti.o: $(ARCHDIR_I686)/crti.asm
+	$(AS) $(ASFLAGS_I686) $(ARCHDIR_I686)/crti.asm -o $(OBJDIR_I686)/crti.o
 
-$(OBJDIR_I686)/tty.o: $(SRCDIR_I686)/arch/i686/tty.c
-	$(CC) -c $(SRCDIR_I686)/arch/i686/tty.c -o $(OBJDIR_I686)/tty.o $(CFLAGS_I686)
+$(OBJDIR_I686)/crtn.o: $(ARCHDIR_I686)/crtn.asm
+	$(AS) $(ASFLAGS_I686) $(ARCHDIR_I686)/crtn.asm -o $(OBJDIR_I686)/crtn.o
+
+$(OBJDIR_I686)/kernel.o: $(SRCDIR)/kernel.c
+	$(CC) -c $(SRCDIR)/kernel.c -o $(OBJDIR_I686)/kernel.o $(CFLAGS_I686)
+
+$(OBJDIR_I686)/tty.o: $(ARCHDIR_I686)/tty.c
+	$(CC) -c $(ARCHDIR_I686)/tty.c -o $(OBJDIR_I686)/tty.o $(CFLAGS_I686)
 
 clean_i686:
 	rm -rf $(OBJDIR_I686) $(BINDIR_I686) $(ISODIR_I686)
