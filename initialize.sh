@@ -22,28 +22,41 @@ sudo apt-get install -y $DEPENDENCIES
 # Compile a GCC cross-compiler to i686-elf
 mkdir -p build
 cd build
-wget -N http://ftpmirror.gnu.org/binutils/$BINUTILS.tar.gz
-wget -N http://ftpmirror.gnu.org/gcc/$GCC/$GCC.tar.gz
-wget -N http://ftpmirror.gnu.org/gmp/$GMP.tar.xz
-wget -N http://ftpmirror.gnu.org/mpfr/$MPFR.tar.xz
-wget -N http://ftpmirror.gnu.org/mpc/$MPC.tar.gz
-wget -N ftp://gcc.gnu.org/pub/gcc/infrastructure/$ISL.tar.bz2
-wget -N ftp://gcc.gnu.org/pub/gcc/infrastructure/$CLOOG.tar.gz
 
+wget -N http://ftpmirror.gnu.org/binutils/$BINUTILS.tar.gz
 echo "Extracting $BINUTILS"
-tar xf $BINUTILS.tar.gz;
+tar xf $BINUTILS.tar.gz
+rm -f $BINUTILS.tar.gz
+
+wget -N http://ftpmirror.gnu.org/gcc/$GCC/$GCC.tar.gz
 echo "Extracting $GCC"
-tar xf $GCC.tar.gz;
+tar xf $GCC.tar.gz
+rm -f $Gcc.tar.gz
+
+wget -N http://ftpmirror.gnu.org/gmp/$GMP.tar.xz
 echo "Extracting $GMP"
-tar xf $GMP.tar.xz;
+tar xf $GMP.tar.xz
+rm -f $GMP.tar.xz
+
+wget -N http://ftpmirror.gnu.org/mpfr/$MPFR.tar.xz
 echo "Extracting $MPFR"
-tar xf $MPFR.tar.xz;
+tar xf $MPFR.tar.xz
+rm -f $MPFR.tar.xz
+
+wget -N http://ftpmirror.gnu.org/mpc/$MPC.tar.gz
 echo "Extracting $MPC"
-tar xf $MPC.tar.gz;
+tar xf $MPC.tar.gz
+rm -f $MPC.tar.gz
+
+wget -N ftp://gcc.gnu.org/pub/gcc/infrastructure/$ISL.tar.bz2
 echo "Extracting $ISL"
-tar xf $ISL.tar.bz2;
+tar xf $ISL.tar.bz2
+rm -f $ISL.tar.bz2
+
+wget -N ftp://gcc.gnu.org/pub/gcc/infrastructure/$CLOOG.tar.gz
 echo "Extracting $CLOOG"
-tar xf $CLOOG.tar.gz;
+tar xf $CLOOG.tar.gz
+rm -f $CLOOG.tar.gz
 
 cd $BINUTILS
 ln -s ../$ISL isl
