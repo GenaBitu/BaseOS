@@ -1,8 +1,8 @@
 #include "../include/kernel.h"
  
-#if defined(__cplusplus)
+#ifdef __cplusplus
 extern "C"
-#endif
+#endif // __cplusplus
 void kernel_early()
 {
 	terminal_initialize();

@@ -7,9 +7,10 @@ LDSCRIPT = linker.ld
 
 ASFLAGS =
 ARFLAGS = rcs
-LDFLAGS = -ffreestanding -O2 -nostdlib
+LDFLAGS = -ffreestanding -O2 --sysroot=$(SYSROOT) -isystem=/usr/include
 LDLIBS = -lgcc
-CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+CFLAGS = --sysroot=$(SYSROOT) -isystem=/usr/include -std=c11 -ffreestanding -fbuiltin -O2 -Wall -Wextra 
+LIBS = -nostdlib -lc -lgcc
 SRCDIR = src
 OBJDIR = obj
 BINDIR = bin
@@ -51,9 +52,9 @@ CRTEND = $(shell $(CC) $(CFLAGS) -print-file-name=crtend.o)
 OBJLIST_KERNEL_I686 = $(OBJDIR_KERNEL_I686)/boot.o $(OBJDIR_KERNEL_I686)/tty.o $(OBJDIR_KERNEL_I686)/kernel.o
 OBJ_KERNEL_I686 = $(CRTI_I686) $(CRTBEGIN) $(OBJLIST_KERNEL_I686) $(CRTEND) $(CRTN_I686)
 
-OBJ_LIBC_I686 =
+OBJ_LIBC_I686 = $(OBJDIR_LIBC_I686)/string/memcmp.o $(OBJDIR_LIBC_I686)/string/memcpy.o $(OBJDIR_LIBC_I686)/string/memmove.o $(OBJDIR_LIBC_I686)/string/memset.o $(OBJDIR_LIBC_I686)/string/strlen.o
 
-SYSROOT = sysroot
+export SYSROOT = $(shell pwd)/sysroot
 SYS_INCDIR = $(SYSROOT)/usr/include
 SYS_LIBDIR = $(SYSROOT)/usr/lib
 
@@ -61,7 +62,7 @@ all: i686
 
 clean: clean_i686
 
-i686: kernel_i686 libc_i686
+i686: libc_i686 kernel_i686
 
 clean_i686: clean_kernel_i686 clean_libc_i686
 
@@ -72,7 +73,7 @@ before_kernel_i686:
 	mkdir -p $(OBJDIR_KERNEL_I686)
 
 out_kernel_i686: $(OBJ_KERNEL_I686) $(LDSCRIPT)
-	$(LD) -T $(LDSCRIPT) -o $(OUT_KERNEL_I686) $(LDFLAGS_I686) $(OBJ_KERNEL_I686) $(LDFLAGS_I686)
+	$(LD) -T $(LDSCRIPT) -o $(OUT_KERNEL_I686) $(LDFLAGS_I686) $(OBJ_KERNEL_I686) $(LDFLAGS_I686) $(LIBS)
 
 $(OBJDIR_KERNEL_I686)/boot.o: $(ARCHDIR_KERNEL_I686)/boot.asm
 	$(AS) $(ASFLAGS_I686) $(ARCHDIR_KERNEL_I686)/boot.asm -o $(OBJDIR_KERNEL_I686)/boot.o
@@ -92,27 +93,42 @@ $(OBJDIR_KERNEL_I686)/kernel.o: $(SRCDIR_KERNEL)/kernel.c
 clean_kernel_i686:
 	rm -rf $(OBJDIR_KERNEL_I686) $(BINDIR_KERNEL_I686) $(ISODIR_I686)
 
-libc_i686: before_libc_i686 out_libc_i686 install_libc_i686
+libc_i686: before_libc_i686 install-headers_libc_i686 out_libc_i686 install-libs_libc_i686
 
 before_libc_i686:
-	mkdir -p $(OBJDIR_LIBC_I686)
+	mkdir -p $(OBJDIR_LIBC_I686) $(OBJDIR_LIBC_I686)/string
+	mkdir -p $(BINDIR_LIBC_I686)
 
 out_libc_i686: $(OBJ_LIBC_I686)
 	$(AR) $(ARFLAGS_I686) $(OUT_LIBC_I686) $(OBJ_LIBC_I686)
 
-install_libc_i686: install-headers_libc_i686 install-libs_libc_i686
+$(OBJDIR_LIBC_I686)/string/memcmp.o: $(SRCDIR_LIBC)/string/memcmp.c
+	$(CC) -c $(SRCDIR_LIBC)/string/memcmp.c -o $(OBJDIR_LIBC_I686)/string/memcmp.o $(CFLAGS_I686)
+
+$(OBJDIR_LIBC_I686)/string/memcpy.o: $(SRCDIR_LIBC)/string/memcpy.c
+	$(CC) -c $(SRCDIR_LIBC)/string/memcpy.c -o $(OBJDIR_LIBC_I686)/string/memcpy.o $(CFLAGS_I686)
+
+$(OBJDIR_LIBC_I686)/string/memmove.o: $(SRCDIR_LIBC)/string/memmove.c
+	$(CC) -c $(SRCDIR_LIBC)/string/memmove.c -o $(OBJDIR_LIBC_I686)/string/memmove.o $(CFLAGS_I686)
+
+$(OBJDIR_LIBC_I686)/string/memset.o: $(SRCDIR_LIBC)/string/memset.c
+	$(CC) -c $(SRCDIR_LIBC)/string/memset.c -o $(OBJDIR_LIBC_I686)/string/memset.o $(CFLAGS_I686)
+
+$(OBJDIR_LIBC_I686)/string/strlen.o: $(SRCDIR_LIBC)/string/strlen.c
+	$(CC) -c $(SRCDIR_LIBC)/string/strlen.c -o $(OBJDIR_LIBC_I686)/string/strlen.o $(CFLAGS_I686)
 
 install-headers_libc_i686: install-headers_libc
 
 install-libs_libc_i686:
 	mkdir -p $(SYS_LIBDIR)
-	cp -RTv $(OBJDIR_LIBC_I686) $(SYS_LIBDIR)
+	cp -RTv $(BINDIR_LIBC_I686) $(SYS_LIBDIR)
 
 clean_libc_i686:
 	rm -rf $(OBJDIR_LIBC_I686)
+	rm -rf $(BINDIR_LIBC_I686)
 
 install-headers_libc:
 	mkdir -p $(SYS_INCDIR)
 	cp -RTv $(INCDIR_LIBC) $(SYS_INCDIR)
 
-.PHONY: all clean i686 clean_i686 kernel_i686 before_kernel_i686 out_kernel_i686 clean_kernel_i686 libc_i686 before_libc_i686 install_libc_i686 install-headers_libc_i686 install-libs_libc_i686 clean_libc_i686
+.PHONY: all clean i686 clean_i686 kernel_i686 before_kernel_i686 out_kernel_i686 clean_kernel_i686 libc_i686 before_libc_i686 install_libc_i686 install-headers_libc_i686 install-libs_libc_i686 clean_libc_i686 install-headers_libc

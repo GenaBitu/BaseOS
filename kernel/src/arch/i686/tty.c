@@ -1,15 +1,5 @@
 #include "../../../include/tty.h"
 
-size_t strlen(const char* str)
-{
-	size_t len = 0;
-	while(str[len] != 0)
-	{
-		len++;
-	}
-	return len;
-}
-
 void terminal_initialize()
 {
 	terminal_row = 0;

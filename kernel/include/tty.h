@@ -4,6 +4,7 @@
 #include "vga.h"
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 size_t terminal_row;
 size_t terminal_column;
