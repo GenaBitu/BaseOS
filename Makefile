@@ -3,6 +3,10 @@ AR = GCC-i686-elf/bin/i686-elf-ar
 LD = GCC-i686-elf/bin/i686-elf-gcc
 CC = GCC-i686-elf/bin/i686-elf-gcc
 
+export SYSROOT = $(shell pwd)/sysroot
+SYS_INCDIR = $(SYSROOT)/usr/include
+SYS_LIBDIR = $(SYSROOT)/usr/lib
+
 LDSCRIPT = linker.ld
 
 ASFLAGS =
@@ -52,15 +56,13 @@ CRTEND = $(shell $(CC) $(CFLAGS) -print-file-name=crtend.o)
 OBJLIST_KERNEL_I686 = $(OBJDIR_KERNEL_I686)/boot.o $(OBJDIR_KERNEL_I686)/tty.o $(OBJDIR_KERNEL_I686)/kernel.o
 OBJ_KERNEL_I686 = $(CRTI_I686) $(CRTBEGIN) $(OBJLIST_KERNEL_I686) $(CRTEND) $(CRTN_I686)
 
-OBJ_LIBC_I686 = $(OBJDIR_LIBC_I686)/string/memcmp.o $(OBJDIR_LIBC_I686)/string/memcpy.o $(OBJDIR_LIBC_I686)/string/memmove.o $(OBJDIR_LIBC_I686)/string/memset.o $(OBJDIR_LIBC_I686)/string/strlen.o
-
-export SYSROOT = $(shell pwd)/sysroot
-SYS_INCDIR = $(SYSROOT)/usr/include
-SYS_LIBDIR = $(SYSROOT)/usr/lib
+OBJ_LIBC_STRING_I686 = $(OBJDIR_LIBC_I686)/string/memcmp.o $(OBJDIR_LIBC_I686)/string/memcpy.o $(OBJDIR_LIBC_I686)/string/memmove.o $(OBJDIR_LIBC_I686)/string/memset.o $(OBJDIR_LIBC_I686)/string/strlen.o
+OBJ_LIBC_I686 = $(OBJ_LIBC_STRING_I686)
 
 all: i686
 
 clean: clean_i686
+	rm -rf $(SYSROOT)
 
 i686: libc_i686 kernel_i686
 
@@ -75,20 +77,14 @@ before_kernel_i686:
 out_kernel_i686: $(OBJ_KERNEL_I686) $(LDSCRIPT)
 	$(LD) -T $(LDSCRIPT) -o $(OUT_KERNEL_I686) $(LDFLAGS_I686) $(OBJ_KERNEL_I686) $(LDFLAGS_I686) $(LIBS)
 
-$(OBJDIR_KERNEL_I686)/boot.o: $(ARCHDIR_KERNEL_I686)/boot.asm
-	$(AS) $(ASFLAGS_I686) $(ARCHDIR_KERNEL_I686)/boot.asm -o $(OBJDIR_KERNEL_I686)/boot.o
+$(OBJDIR_KERNEL_I686)/%.o: $(ARCHDIR_KERNEL_I686)/%.asm
+	$(AS) $(ASFLAGS_I686) $< -o $@
 
-$(OBJDIR_KERNEL_I686)/crti.o: $(ARCHDIR_KERNEL_I686)/crti.asm
-	$(AS) $(ASFLAGS_I686) $(ARCHDIR_KERNEL_I686)/crti.asm -o $(OBJDIR_KERNEL_I686)/crti.o
+$(OBJDIR_KERNEL_I686)/%.o: $(ARCHDIR_KERNEL_I686)/%.c
+	$(CC) -c $< -o $@ $(CFLAGS_I686)
 
-$(OBJDIR_KERNEL_I686)/crtn.o: $(ARCHDIR_KERNEL_I686)/crtn.asm
-	$(AS) $(ASFLAGS_I686) $(ARCHDIR_KERNEL_I686)/crtn.asm -o $(OBJDIR_KERNEL_I686)/crtn.o
-
-$(OBJDIR_KERNEL_I686)/tty.o: $(ARCHDIR_KERNEL_I686)/tty.c
-	$(CC) -c $(ARCHDIR_KERNEL_I686)/tty.c -o $(OBJDIR_KERNEL_I686)/tty.o $(CFLAGS_I686)
-
-$(OBJDIR_KERNEL_I686)/kernel.o: $(SRCDIR_KERNEL)/kernel.c
-	$(CC) -c $(SRCDIR_KERNEL)/kernel.c -o $(OBJDIR_KERNEL_I686)/kernel.o $(CFLAGS_I686)
+$(OBJDIR_KERNEL_I686)/%.o: $(SRCDIR_KERNEL)/%.c
+	$(CC) -c $< -o $@ $(CFLAGS_I686)
 
 clean_kernel_i686:
 	rm -rf $(OBJDIR_KERNEL_I686) $(BINDIR_KERNEL_I686) $(ISODIR_I686)
@@ -102,20 +98,8 @@ before_libc_i686:
 out_libc_i686: $(OBJ_LIBC_I686)
 	$(AR) $(ARFLAGS_I686) $(OUT_LIBC_I686) $(OBJ_LIBC_I686)
 
-$(OBJDIR_LIBC_I686)/string/memcmp.o: $(SRCDIR_LIBC)/string/memcmp.c
-	$(CC) -c $(SRCDIR_LIBC)/string/memcmp.c -o $(OBJDIR_LIBC_I686)/string/memcmp.o $(CFLAGS_I686)
-
-$(OBJDIR_LIBC_I686)/string/memcpy.o: $(SRCDIR_LIBC)/string/memcpy.c
-	$(CC) -c $(SRCDIR_LIBC)/string/memcpy.c -o $(OBJDIR_LIBC_I686)/string/memcpy.o $(CFLAGS_I686)
-
-$(OBJDIR_LIBC_I686)/string/memmove.o: $(SRCDIR_LIBC)/string/memmove.c
-	$(CC) -c $(SRCDIR_LIBC)/string/memmove.c -o $(OBJDIR_LIBC_I686)/string/memmove.o $(CFLAGS_I686)
-
-$(OBJDIR_LIBC_I686)/string/memset.o: $(SRCDIR_LIBC)/string/memset.c
-	$(CC) -c $(SRCDIR_LIBC)/string/memset.c -o $(OBJDIR_LIBC_I686)/string/memset.o $(CFLAGS_I686)
-
-$(OBJDIR_LIBC_I686)/string/strlen.o: $(SRCDIR_LIBC)/string/strlen.c
-	$(CC) -c $(SRCDIR_LIBC)/string/strlen.c -o $(OBJDIR_LIBC_I686)/string/strlen.o $(CFLAGS_I686)
+$(OBJDIR_LIBC_I686)/%.o: $(SRCDIR_LIBC)/%.c
+	$(CC) -c $< -o $@ $(CFLAGS_I686)
 
 install-headers_libc_i686: install-headers_libc
 
