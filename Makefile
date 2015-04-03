@@ -56,7 +56,7 @@ CRTEND = $(shell $(CC) $(CFLAGS) -print-file-name=crtend.o)
 OBJLIST_KERNEL_I686 = $(OBJDIR_KERNEL_I686)/boot.o $(OBJDIR_KERNEL_I686)/tty.o $(OBJDIR_KERNEL_I686)/kernel.o
 OBJ_KERNEL_I686 = $(CRTI_I686) $(CRTBEGIN) $(OBJLIST_KERNEL_I686) $(CRTEND) $(CRTN_I686)
 
-OBJ_LIBC_STRING_I686 = $(OBJDIR_LIBC_I686)/string/memcmp.o $(OBJDIR_LIBC_I686)/string/memcpy.o $(OBJDIR_LIBC_I686)/string/memmove.o $(OBJDIR_LIBC_I686)/string/memset.o $(OBJDIR_LIBC_I686)/string/strlen.o
+OBJ_LIBC_STRING_I686 = $(OBJDIR_LIBC_I686)/string/memcpy.o $(OBJDIR_LIBC_I686)/string/memmove.o $(OBJDIR_LIBC_I686)/string/strcpy.o $(OBJDIR_LIBC_I686)/string/strncpy.o $(OBJDIR_LIBC_I686)/string/strcat.o $(OBJDIR_LIBC_I686)/string/strncat.o $(OBJDIR_LIBC_I686)/string/memcmp.o $(OBJDIR_LIBC_I686)/string/strcmp.o $(OBJDIR_LIBC_I686)/string/strncmp.o $(OBJDIR_LIBC_I686)/string/memchr.o $(OBJDIR_LIBC_I686)/string/memset.o $(OBJDIR_LIBC_I686)/string/strlen.o
 OBJ_LIBC_I686 = $(OBJ_LIBC_STRING_I686)
 
 all: i686
