@@ -57,7 +57,9 @@ OBJLIST_KERNEL_I686 = $(OBJDIR_KERNEL_I686)/boot.o $(OBJDIR_KERNEL_I686)/tty.o $
 OBJ_KERNEL_I686 = $(CRTI_I686) $(CRTBEGIN) $(OBJLIST_KERNEL_I686) $(CRTEND) $(CRTN_I686)
 
 OBJ_LIBC_STRING_I686 = $(OBJDIR_LIBC_I686)/string/memcpy.o $(OBJDIR_LIBC_I686)/string/memmove.o $(OBJDIR_LIBC_I686)/string/strcpy.o $(OBJDIR_LIBC_I686)/string/strncpy.o $(OBJDIR_LIBC_I686)/string/strcat.o $(OBJDIR_LIBC_I686)/string/strncat.o $(OBJDIR_LIBC_I686)/string/memcmp.o $(OBJDIR_LIBC_I686)/string/strcmp.o $(OBJDIR_LIBC_I686)/string/strncmp.o $(OBJDIR_LIBC_I686)/string/memchr.o $(OBJDIR_LIBC_I686)/string/memset.o $(OBJDIR_LIBC_I686)/string/strlen.o
-OBJ_LIBC_I686 = $(OBJ_LIBC_STRING_I686)
+OBJ_LIBC_STDIO_I686 = $(OBJDIR_LIBC_I686)/stdio/putchar.o $(OBJDIR_LIBC_I686)/stdio/puts.o
+OBJ_LIBC_STDLIB_I686 = $(OBJDIR_LIBC_I686)/stdlib/abort.o
+OBJ_LIBC_I686 = $(OBJ_LIBC_STRING_I686) $(OBJ_LIBC_STDIO_I686) $(OBJ_LIBC_STDLIB_I686)
 
 all: i686
 
@@ -92,7 +94,7 @@ clean_kernel_i686:
 libc_i686: before_libc_i686 install-headers_libc_i686 out_libc_i686 install-libs_libc_i686
 
 before_libc_i686:
-	mkdir -p $(OBJDIR_LIBC_I686) $(OBJDIR_LIBC_I686)/string
+	mkdir -p $(OBJDIR_LIBC_I686) $(OBJDIR_LIBC_I686)/string $(OBJDIR_LIBC_I686)/stdio $(OBJDIR_LIBC_I686)/stdlib
 	mkdir -p $(BINDIR_LIBC_I686)
 
 out_libc_i686: $(OBJ_LIBC_I686)
