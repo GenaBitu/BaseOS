@@ -64,7 +64,7 @@ OBJ_LIBC_I686 = $(OBJ_LIBC_STRING_I686) $(OBJ_LIBC_STDIO_I686) $(OBJ_LIBC_STDLIB
 .DEFAULT_GOAL := help
 
 setup: ## Setup development environment
-	./initialize.sh
+	@./initialize.sh
 
 all: i686 ## Build kernel and libc for all architectures.
 
@@ -73,7 +73,7 @@ clean: clean_i686 ## Clean all build files
 
 i686: libc_i686 kernel_i686 ## Build kernel and libc for i686
 
-clean_i686: clean_kernel_i686 clean_libc_i686 ## Clean build files for i686
+clean_i686: clean_kernel_i686 clean_libc_i686 clean_make-iso_i686 ## Clean build files for i686
 
 kernel_i686: before_kernel_i686 out_kernel_i686 ## Build kernel for i686
 
@@ -94,7 +94,7 @@ $(OBJDIR_KERNEL_I686)/%.o: $(SRCDIR_KERNEL)/%.c
 	$(CC) -c $< -o $@ $(CFLAGS_I686)
 
 clean_kernel_i686: ## Clean kernel build files for i686
-	rm -rf $(OBJDIR_KERNEL_I686) $(BINDIR_KERNEL_I686) $(ISODIR_I686)
+	rm -rf $(OBJDIR_KERNEL_I686) $(BINDIR_KERNEL_I686)
 
 libc_i686: before_libc_i686 install-headers_libc_i686 out_libc_i686 install-libs_libc_i686 ## Build libc for i686
 
@@ -122,8 +122,32 @@ install-headers_libc:  ## Install libc headers for any architecture
 	mkdir -p $(SYS_INCDIR)
 	cp -RTv $(INCDIR_LIBC) $(SYS_INCDIR)
 
-help:
-	@printf "\033[0;31mIf you don't know what you are doing, just run \"make run_i686\".\033[0m\n"
+kernel/bin/i686/BaseOS.bin: i686
+
+make-iso_i686: kernel/bin/i686/BaseOS.bin before_make-iso_i686 ## Make bootable iso file from compiled system. Installs GRUB.
+	cp kernel/bin/i686/BaseOS.bin isodir/boot/BaseOS.bin
+	cp grub.cfg isodir/boot/grub/grub.cfg
+	grub-mkrescue -o iso/i686/BaseOS.iso isodir
+
+before_make-iso_i686:
+	mkdir -p isodir
+	mkdir -p isodir/boot
+	mkdir -p isodir/boot/grub
+	mkdir -p iso/i686
+
+clean_make-iso_i686: ## Clean ISO files for i686
+	rm -rf $(ISODIR_I686)
+	rm -rf isodir
+
+iso/i686/BaseOS.iso: make-iso_i686
+
+run: run_i686 ## Run BaseOS in default (i686) QEMU
+
+run_i686: iso/i686/BaseOS.iso ## Run BaseOS in i686 QEMU
+	qemu-system-i386 -cdrom iso/i686/BaseOS.iso
+
+help: ## Print this help
+	@printf "\033[0;31mIf you don't know what you are doing, just run \"make setup\", followed by \"make run\".\033[0m\n"
 	@grep -E '^[a-zA-Z0-9_-]+:.*?##.*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: all help clean i686 clean_i686 kernel_i686 before_kernel_i686 out_kernel_i686 clean_kernel_i686 libc_i686 before_libc_i686 install_libc_i686 install-headers_libc_i686 install-libs_libc_i686 clean_libc_i686 install-headers_libc

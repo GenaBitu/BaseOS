@@ -16,6 +16,8 @@ ISL="isl-0.12.2"
 CLOOG="cloog-0.18.1"
 TEXINFO="texinfo-5.2"
 
+printf "This script will install all dependencies and compile a cross-compiler needed to build BaseOS. \033[0;31mThis may take quite some time (30 minutes on old machines).\033[0m For this, it also needs to run some commands as a \033[0;36msuper-user\033[0m. Feel free to inspect the code in \"initialize.sh\".\n"
+
 sudo apt-get update
 sudo apt-get install -y $DEPENDENCIES
 
