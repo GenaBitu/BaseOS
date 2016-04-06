@@ -61,16 +61,21 @@ OBJ_LIBC_STDIO_I686 = $(OBJDIR_LIBC_I686)/stdio/putchar.o $(OBJDIR_LIBC_I686)/st
 OBJ_LIBC_STDLIB_I686 = $(OBJDIR_LIBC_I686)/stdlib/abort.o
 OBJ_LIBC_I686 = $(OBJ_LIBC_STRING_I686) $(OBJ_LIBC_STDIO_I686) $(OBJ_LIBC_STDLIB_I686)
 
-all: i686
+.DEFAULT_GOAL := help
 
-clean: clean_i686
+setup: ## Setup development environment
+	./initialize.sh
+
+all: i686 ## Build kernel and libc for all architectures.
+
+clean: clean_i686 ## Clean all build files
 	rm -rf $(SYSROOT)
 
-i686: libc_i686 kernel_i686
+i686: libc_i686 kernel_i686 ## Build kernel and libc for i686
 
-clean_i686: clean_kernel_i686 clean_libc_i686
+clean_i686: clean_kernel_i686 clean_libc_i686 ## Clean build files for i686
 
-kernel_i686: before_kernel_i686 out_kernel_i686
+kernel_i686: before_kernel_i686 out_kernel_i686 ## Build kernel for i686
 
 before_kernel_i686:
 	mkdir -p $(BINDIR_KERNEL_I686)
@@ -88,10 +93,10 @@ $(OBJDIR_KERNEL_I686)/%.o: $(ARCHDIR_KERNEL_I686)/%.c
 $(OBJDIR_KERNEL_I686)/%.o: $(SRCDIR_KERNEL)/%.c
 	$(CC) -c $< -o $@ $(CFLAGS_I686)
 
-clean_kernel_i686:
+clean_kernel_i686: ## Clean kernel build files for i686
 	rm -rf $(OBJDIR_KERNEL_I686) $(BINDIR_KERNEL_I686) $(ISODIR_I686)
 
-libc_i686: before_libc_i686 install-headers_libc_i686 out_libc_i686 install-libs_libc_i686
+libc_i686: before_libc_i686 install-headers_libc_i686 out_libc_i686 install-libs_libc_i686 ## Build libc for i686
 
 before_libc_i686:
 	mkdir -p $(OBJDIR_LIBC_I686) $(OBJDIR_LIBC_I686)/string $(OBJDIR_LIBC_I686)/stdio $(OBJDIR_LIBC_I686)/stdlib
@@ -103,18 +108,22 @@ out_libc_i686: $(OBJ_LIBC_I686)
 $(OBJDIR_LIBC_I686)/%.o: $(SRCDIR_LIBC)/%.c
 	$(CC) -c $< -o $@ $(CFLAGS_I686)
 
-install-headers_libc_i686: install-headers_libc
+install-headers_libc_i686: install-headers_libc ## Install libc headers for i686 (just calls install-headers_libc)
 
-install-libs_libc_i686:
+install-libs_libc_i686: ## Install libc for i686
 	mkdir -p $(SYS_LIBDIR)
 	cp -RTv $(BINDIR_LIBC_I686) $(SYS_LIBDIR)
 
-clean_libc_i686:
+clean_libc_i686: ## Clean libc build files for i686
 	rm -rf $(OBJDIR_LIBC_I686)
 	rm -rf $(BINDIR_LIBC_I686)
 
-install-headers_libc:
+install-headers_libc:  ## Install libc headers for any architecture
 	mkdir -p $(SYS_INCDIR)
 	cp -RTv $(INCDIR_LIBC) $(SYS_INCDIR)
 
-.PHONY: all clean i686 clean_i686 kernel_i686 before_kernel_i686 out_kernel_i686 clean_kernel_i686 libc_i686 before_libc_i686 install_libc_i686 install-headers_libc_i686 install-libs_libc_i686 clean_libc_i686 install-headers_libc
+help:
+	@printf "\033[0;31mIf you don't know what you are doing, just run \"make run_i686\".\033[0m\n"
+	@grep -E '^[a-zA-Z0-9_-]+:.*?##.*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: all help clean i686 clean_i686 kernel_i686 before_kernel_i686 out_kernel_i686 clean_kernel_i686 libc_i686 before_libc_i686 install_libc_i686 install-headers_libc_i686 install-libs_libc_i686 clean_libc_i686 install-headers_libc
